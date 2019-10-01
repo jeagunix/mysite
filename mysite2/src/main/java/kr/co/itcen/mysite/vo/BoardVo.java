@@ -12,6 +12,13 @@ public class BoardVo {
 	private Long userNo;
 	private int status;
 	private String userName;
+	private String keyword;
+	public String getKeyword() {
+		return keyword;
+	}
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
 	public String getUserName() {
 		return userName;
 	}

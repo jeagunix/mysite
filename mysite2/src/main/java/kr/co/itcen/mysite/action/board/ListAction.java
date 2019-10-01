@@ -37,6 +37,7 @@ public class ListAction implements Action {
 		}
 
 		String pageMove = request.getParameter("move");
+		System.out.println(pageMove);
 
 		int pageAll = countAll % SHOW_CNT == 0 ? countAll / SHOW_CNT : countAll / SHOW_CNT + 1;
 		int startPage = (currentPage % SHOW_PAGE) == 0 ? ((currentPage / SHOW_PAGE) - 1) * SHOW_PAGE + 1
@@ -54,7 +55,7 @@ public class ListAction implements Action {
 		if (pageAll < lastPage) {
 			lastPage = pageAll;
 		}
-
+		
 		request.setAttribute("countAll", countAll - (currentPage - 1) * SHOW_CNT);
 		request.setAttribute("pageAll", pageAll);
 		request.setAttribute("startPage", startPage);
@@ -62,7 +63,7 @@ public class ListAction implements Action {
 
 		List<BoardVo> list = new BoardDao().getList(currentPage, SHOW_CNT, kwd);
 		request.setAttribute("list", list);
-
+		
 		WebUtils.forward(request, response, "/WEB-INF/views/board/list.jsp");
 
 	}
