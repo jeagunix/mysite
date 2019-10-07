@@ -90,7 +90,7 @@ $(function(){
 					<form:password path='password' />
 					
 					<label class="block-label">성별</label>
-					<P>
+					<P style="text-align : left">
 						<form:radiobuttons items="${userVo.genders}" path="gender" />
 					</P>
 					

@@ -15,7 +15,7 @@ public class UserVo {
 	@Email
 	private String email;
 	private String password;
-	private String genders;
+
 	private String joinDate;
 	private String gender;
 	private String role;
@@ -69,7 +69,7 @@ public class UserVo {
 	}
 
 	public String[] getGenders() {
-		return new String[] { "남자", "여자" };
+		return new String[] { "male", "female" };
 	}
 
 	public String getJoinDate() {
@@ -82,8 +82,8 @@ public class UserVo {
 
 	@Override
 	public String toString() {
-		return "UserVo [no=" + no + ", name=" + name + ", email=" + email + ", password=" + password + ", genders="
-				+ genders + ", joinDate=" + joinDate + ", gender=" + gender + ", role=" + role + "]";
+		return "UserVo [no=" + no + ", name=" + name + ", email=" + email + ", password=" + password + ", joinDate="
+				+ joinDate + ", gender=" + gender + ", role=" + role + "]";
 	}
 
 }
