@@ -52,7 +52,9 @@ public class UserDao {
 	}
 
 	public UserVo get(String email) {
+		System.out.println(email);
 		UserVo result = sqlSession.selectOne("user.getByEmail", email);
+		System.out.println(result+"aaasdasd");
 		return result;
 	}
 

@@ -1,4 +1,3 @@
-  
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
@@ -14,13 +13,13 @@
 <script src="${pageContext.servletContext.contextPath }/assets/js/jquery/jquery-1.9.0.js" type="text/javascript"></script>
 <script>
 $(function(){
-	$("#input-email").change(function(){
+	$("#email").change(function(){
 		$("#btn-check-email").show();
 		$("#img-checked").hide();
 	});	
 	
 	$("#btn-check-email").click(function(){
-		var email = $("#input-email").val();
+		var email = $("#email").val();
 		if(email == ""){
 			return;
 		}
@@ -39,8 +38,8 @@ $(function(){
 				
 				if(response.data == true){
 					alert("이미 존재하는 메일입니다.");
-					$("#input-email").val("");
-					$("#input-email").focus();
+					$("#email").val("");
+					$("#email").focus();
 					return;
 				}
 				
@@ -79,7 +78,7 @@ $(function(){
 					</spring:hasBindErrors>
 					
 					<label class="block-label" for="email">이메일</label>
-					<form:input path="email" />
+					<form:input path="email"/>
 					<input id="btn-check-email" type="button" value="중복확인">
 					<img id="img-checked" style='width:20px; display:none' src='${pageContext.servletContext.contextPath }/assets/images/check.png'/>
 					<p style="font-weight:bold; color:red; text-align:left; padding:2px 0 0 0">

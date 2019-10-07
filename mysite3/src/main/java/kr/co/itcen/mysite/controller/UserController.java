@@ -25,11 +25,11 @@ public class UserController {
 
 	@Auth("USER") // @Auth(value="USER")
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
-	public String update(@ModelAttribute @AuthUser UserVo authUser) {
+	public String update(@AuthUser UserVo authUser, Model model) {
 		// 접근 제어(ACL) /////////////////////////
 		Long no = authUser.getNo();
 		authUser = userService.select(no);
-
+		model.addAttribute("viewImfor", authUser);
 		return "user/update";
 	}
 
