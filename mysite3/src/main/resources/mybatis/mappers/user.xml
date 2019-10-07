@@ -10,7 +10,7 @@
 		<![CDATA[
 		insert
 		  into user
-		values (null, #{name }, #{email }, #{password }, #{gender }, now())
+		values (null, #{name }, #{email }, #{password }, #{gender }, "USER", now())
 		]]>
 		<selectKey keyProperty="no" resultType="Long">
 			<![CDATA[
@@ -22,7 +22,7 @@
 	<select id="getByEmail" parameterType="string"
 		resultType="uservo">
 		<![CDATA[
-		select no, email
+		select no, email, role
 		  from user
 		 where email = #{email }		
 		]]>
@@ -31,7 +31,7 @@
 	<select id="getByEmailAndPassword1" parameterType="uservo"
 		resultType="uservo">
 		<![CDATA[
-		select no, name 
+		select no, name, role
 		  from user
 		 where email = #{email }
 		   and password = #{password }		
