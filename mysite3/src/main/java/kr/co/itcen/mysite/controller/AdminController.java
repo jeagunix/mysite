@@ -14,10 +14,14 @@ public class AdminController {
 	public String main() {
 		return "admin/main";
 	}
+	@RequestMapping("/guestbook")
+	public String guestbook() {
+		return "admin/guestbook";
+	}
 	
 	@RequestMapping("/board")
-	public String guestbook() {
-		return "admin/main";
+	public String board() {
+		return "admin/board";
 	}
 	@RequestMapping("/user")
 	public String user() {

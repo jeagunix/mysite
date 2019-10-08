@@ -27,6 +27,7 @@ public class UserController {
 	@RequestMapping(value = "/update", method = RequestMethod.GET)
 	public String update(@AuthUser UserVo authUser, Model model) {
 		// 접근 제어(ACL) /////////////////////////
+		System.out.println(authUser);
 		Long no = authUser.getNo();
 		authUser = userService.select(no);
 		model.addAttribute("viewImfor", authUser);
@@ -34,12 +35,12 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String update(@ModelAttribute UserVo vo, HttpSession session) {
-		UserVo authUser = (UserVo) session.getAttribute("authUser");
+	public String update(@AuthUser UserVo authUser, @ModelAttribute UserVo vo, Model model) {
+		
 		Long no = authUser.getNo();
 		vo.setNo(no);
-
 		userService.update(vo);
+		
 		return "redirect:/user/update";
 	}
 
@@ -63,34 +64,5 @@ public class UserController {
 	public String login() {
 		return "user/login";
 	}
-
-//	@RequestMapping(value="/login", method=RequestMethod.POST)
-//	public String login(UserVo vo, HttpSession session, Model model) {
-//		UserVo userVo = userService.getUser(vo);
-//		if(userVo == null) {
-//			model.addAttribute("result", "fail");
-//			return "redirect:/user";
-//		}
-//		// 로그인 처리
-//		session.setAttribute("authUser", userVo);
-//		return "redirect:/user";
-//	}
-
-//	@RequestMapping(value="/logout", method=RequestMethod.GET)
-//	public String logout(HttpSession session) {
-//		//접근 제어(ACL)
-//		UserVo authUser = (UserVo)session.getAttribute("authUser");
-//		if(authUser != null) {
-//			session.removeAttribute("authUser");
-//			session.invalidate();
-//		}
-//
-//		return "redirect:/user";
-//	}
-
-//	@ExceptionHandler(UserDaoException.class)
-//	public String handlerException() {
-//		return "error/exception";
-//	}
 
 }
