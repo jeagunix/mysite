@@ -13,35 +13,41 @@ import kr.co.itcen.mysite.service.GuestbookService;
 import kr.co.itcen.mysite.vo.GuestbookVo;
 
 @Controller
-@RequestMapping("/guestbook") 
+@RequestMapping("/guestbook")
 public class GuestbookController {
-	
+
 	@Autowired
 	private GuestbookService guestService;
-	
-	@RequestMapping(value="", method=RequestMethod.GET)
+
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public String index(Model model) {
-		List<GuestbookVo> list= guestService.getList();
+		List<GuestbookVo> list = guestService.getList();
 		model.addAttribute("list", list);
 		return "guestbook/list";
 	}
-	
-	@RequestMapping(value="/delete/{no}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/delete/{no}", method = RequestMethod.GET)
 	public String delete(@PathVariable("no") Long no, Model model) {
-		model.addAttribute("no", no); //객체를 보낸다.
+		model.addAttribute("no", no); // 객체를 보낸다.
 		return "guestbook/delete";
 	}
-	
-	@RequestMapping(value="/delete", method=RequestMethod.POST)
+
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	public String delete(@ModelAttribute GuestbookVo vo) {
 		guestService.delete(vo);
 		return "redirect:/guestbook";
 	}
-	
-	@RequestMapping(value="/add", method=RequestMethod.POST)
+
+
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String add(@ModelAttribute GuestbookVo vo) {
 		guestService.insert(vo);
 		return "redirect:/guestbook";
+	}
+
+	@RequestMapping(value = "/spa", method = RequestMethod.GET)
+	public String spa() {
+		return "guestbook/index-spa";
 	}
 
 }
