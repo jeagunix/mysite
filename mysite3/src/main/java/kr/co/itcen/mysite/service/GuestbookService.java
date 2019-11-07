@@ -11,7 +11,10 @@ import kr.co.itcen.mysite.vo.GuestbookVo;
 public class GuestbookService {
 	@Autowired
 	private GuestbookDao guestbookDao;
-
+	
+	public List<GuestbookVo> getContentList(Long startNo) {
+		return guestbookDao.getList(startNo);
+	}	
 	public List<GuestbookVo> getList() {
 		return guestbookDao.getList();
 		

@@ -12,7 +12,64 @@
 <script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+var isEnd = false;
+var startNo = 0;
+var render = function(vo, mode){
+	// template library를 사용한다.(html rendering libary)
+	// ejs, underscore, mustache
+	var html = 
+		"<li data-no='" + vo.no + "'>" +
+		"<strong>"+ vo.name +"</strong>" +
+		"<p>"+ vo.contents.replace(/\n/gi, "<br>") + "</p>" +
+		"<strong></strong>" +
+		"<a href='' data-no='" + vo.no + "'>삭제</a>" + 
+		"</li>";
+		
+	if(mode){
+		$("#list-guestbook").append(html);
+	} else {	
+		$("#list-guestbook").prepend(html);
+	}
+	//$("#list-guestbook")[mode ? "append" | "prepend"](html);
+}
+var fetchList = function(){
+	if(isEnd){
+		return;
+	}
+	
+	$.ajax({
+		url: "${pageContext.request.contextPath }/api/guestbook/list/" + startNo,
+		type: "get",
+		dataType: 'json',
+		data: "",
+		success: function(response){
+			console.log(response);
+			
+			if(response.result != "success"){
+				console.error(response.message);
+				return;
+			}
+			
+			// detect end
+			if(response.data.length == 0){
+				isEnd = true;
+				$("#btn-next").prop("disabled", true);
+				return;
+			}
+			
+			$.each(response.data, function(index, vo){
+				render(vo, true);
+			})
+			
+			startNo = $("#list-guestbook li").last().data("no") || 0;
+		},
+		error: function(xhr, status, e){
+			console.error(status + ":" + e);
+		}
+	});			
+}
 $(function(){
+	$("#btn-next").click(fetchList);
 	$("#add-form").submit(function(event){
 		event.preventDefault();
 		
@@ -26,7 +83,7 @@ $(function(){
 		
 		//ajax 통신
 		$.ajax({
-			url: "/mysite3/api/guestbook/add",
+			url: "${pageContext.request.contextPath }/api/guestbook/add",
 			type: "post",
 			contentType: 'application/json', // 보내는 데이터의 타입: post방식 json
 			dataType: 'json',                // 받는 데이터의 타입
@@ -39,22 +96,30 @@ $(function(){
 				}
 				
 				// rendering
-				var html = 
-					"<li data-no='" + response.data.no + "'>" +
-					"<strong>"+ response.data.name +"</strong>" +
-					"<p>"+ response.data.contents + "</p>" +
-					"<strong></strong>" +
-					"<a href='' data-no='" + response.data.no + "'>삭제</a>" + 
-					"</li>";
-				$("#list-guestbook").prepend(html);
+				render(response.data);
+				
+				// form reset		
 				$("#add-form")[0].reset();
 			},
 			error: function(xhr, status, e){
 				console.error(status + ":" + e);
 			}
 		});
-		
-	})	
+	})
+	
+	$(window).scroll(function(){
+		var $window = $(this)
+		var windowHeight = $window.height();
+		var scrollTop = $window.scrollTop();
+		var documentHeight = $(document).height();
+	
+		if(scrollTop + windowHeight + 10 > documentHeight){
+			fetchList();
+		}
+	});
+	
+	// 처음 리스트 가져오기
+	fetchList();
 });
 </script>
 </head>
@@ -70,39 +135,13 @@ $(function(){
 					<textarea id="tx-content" placeholder="내용을 입력해 주세요."></textarea>
 					<input type="submit" value="보내기" />
 				</form>
+	
+				<button id="btn-next">next</button>
+
 				<ul id="list-guestbook">
-
-					<li data-no=''>
-						<strong>지나가다가</strong>
-						<p>
-							별루입니다.<br>
-							비번:1234 -,.-
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-					
-					<li data-no=''>
-						<strong>둘리</strong>
-						<p>
-							안녕하세요<br>
-							홈페이지가 개 굿 입니다.
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-
-					<li data-no=''>
-						<strong>주인</strong>
-						<p>
-							아작스 방명록 입니다.<br>
-							테스트~
-						</p>
-						<strong></strong>
-						<a href='' data-no=''>삭제</a> 
-					</li>
-					
-									
+				
+				
+				
 				</ul>
 			</div>
 			<div id="dialog-delete-form" title="메세지 삭제" style="display:none">

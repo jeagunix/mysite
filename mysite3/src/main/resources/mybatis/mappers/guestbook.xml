@@ -11,8 +11,9 @@
 			 order by reg_date desc;
 	   ]]>
 	</select>
-	
-	<select id="getList2" parameterType="long" resultType="guestbookvo">
+
+	<select id="getList2" parameterType="long"
+		resultType="guestbookvo">
 		<![CDATA[
 			select no,
 				   name,
@@ -21,16 +22,16 @@
 			  from guestbook
 		]]>
 		<!-- 기본 값이 넘어오는데 조건문 같은 것이 있으면 parameter라고 작성해야 한다. -->
-			 <if test='_parameter > 0'>
+		<if test='_parameter > 0'>
 				<![CDATA[	 
 				 where no >#{_parameter } 
 		   		]]>
-	   		</if>
+		</if>
 	   <![CDATA[	 
 			 order by reg_date desc;
 	   ]]>
 	</select>
-	
+
 	<insert id="insert" parameterType="guestbookvo">
 		<!-- 오라클 같은 경우에는 no값을 먼저 올린다. -->
 		<!-- mysql 같은 경우에는 no값을 나중에 올린다. -->
@@ -45,15 +46,15 @@
 			]]>
 		</selectKey>
 	</insert>
-	
+
 	<delete id="delete" parameterType="guestbookvo">
 		<![CDATA[
 			delete 
 			  from guestbook
 			 where no = #{no } and password = #{password }
 		]]>
-		
+
 	</delete>
-	
+
 
 </mapper>
