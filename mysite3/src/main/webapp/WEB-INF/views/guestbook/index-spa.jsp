@@ -11,8 +11,40 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/ejs/ejs.js"></script>
+<style type="text/css">
+.ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset{
+	float: none;
+	text-align:center
+}
+.ui-dialog .ui-dialog-buttonpane button {
+	margin-left:10px;
+	margin-right:auto;
+}
+#dialog-message p {
+	padding:20px 0;
+	font-weight:bold;
+	font-size:1.0em;
+}
+#dialog-delete-form p {
+	padding:10px;
+	font-weight:bold;
+	font-size:1.0em; 
+}
+#dialog-delete-form p.error {
+	color: #f00;
+}
+#dialog-delete-form input[type="password"] {
+	padding:5px;
+	border:1px solid #888;
+	outline: none;
+	width: 180px;
+}
+</style>
 <script>
+//
 // jquery plug-in
+//
 (function($){
 	$.fn.hello = function(){
 		console.log("hello #" + $(this).attr("id"));
@@ -36,8 +68,30 @@
 <script>
 var isEnd = false;
 var startNo = 0;
+var messageBox = function(title, message, callback){
+	$("#dialog-message p").text(message);
+	$("#dialog-message")
+		.attr("title", title)				
+		.dialog({
+			modal: true,
+			buttons: {
+				"확인": function(){
+					$(this).dialog('close');
+				}
+			},
+			close: function(){
+				callback && callback();
+			}
+		});	
+}
+var listItemTemplate = new EJS({
+	url: "${pageContext.request.contextPath }/assets/js/ejs-templates/list-item-template.ejs"
+});
+var listTemplate = new EJS({
+	url: "${pageContext.request.contextPath }/assets/js/ejs-templates/list-template.ejs"
+});
 var render = function(vo, mode){
-	// template library를 사용한다.(html rendering libary)
+	// template library를 사용한다.(html rendering engine libary)
 	// ejs, underscore, mustache
 	var html = 
 		"<li data-no='" + vo.no + "'>" +
@@ -61,6 +115,7 @@ var fetchList = function(){
 	
 	$.ajax({
 		url: "${pageContext.request.contextPath }/api/guestbook/list/" + startNo,
+		async: true,
 		type: "get",
 		dataType: 'json',
 		data: "",
@@ -79,9 +134,9 @@ var fetchList = function(){
 				return;
 			}
 			
-			$.each(response.data, function(index, vo){
-				render(vo, true);
-			})
+			// rendering
+			var html = listTemplate.render(response);
+			$("#list-guestbook").append(html);
 			
 			startNo = $("#list-guestbook li").last().data("no") || 0;
 		},
@@ -91,6 +146,50 @@ var fetchList = function(){
 	});			
 }
 $(function(){
+	var dialogDelete = $("#dialog-delete-form").dialog({
+		autoOpen: false,
+		width: 300,
+		height: 170,
+		modal: true,
+		buttons: {
+			"삭제": function(){
+				var no = $("#no-delete").val();
+				var password = $("#password-delete").val();
+				
+				console.log(password);
+				
+				$.ajax({
+					url: "${pageContext.request.contextPath }/api/guestbook/" + no,
+					type: "delete",
+					dataType: 'json',
+					data: "password="+password,
+					success: function(response){
+						console.log(response);
+						if(response.result != "success"){
+							console.error(response.message);
+							return;
+						}
+						
+						if(response.data != -1){
+							$("#list-guestbook li[data-no=" + response.data + "]").remove();
+							dialogDelete.dialog("close");
+						}
+					},
+					error: function(xhr, status, e){
+						console.error(status + ":" + e);
+					}
+				});				
+			},
+			"취소": function(){
+				dialogDelete.dialog("close");
+			}
+		},
+		close: function(){
+			$("#no-delete").val("");
+			$("#password-delete").val("");
+		}
+	});
+	
 	$("#btn-next").click(fetchList);
 	$("#add-form").submit(function(event){
 		event.preventDefault();
@@ -100,29 +199,27 @@ $(function(){
 		// validation(client side)
 		vo.name = $("#input-name").val();
 		if(vo.name == ""){
-			$("#dialog-message p").text("이름은 필수 입력항목 입니다.");
-			$("#dialog-message")
-				.attr("title", "방명록남기기")				
-				.dialog();
-			
-			$("#input-name").focus();
+			messageBox("방명록남기기", "이름은 필수 입력항목 입니다.", function(){
+				$("#input-name").focus();
+			});
 			return;
 		}
 		
 		vo.password = $("#input-password").val();
 		if(vo.password == ""){
-			$("#dialog-message p").text("비밀번호는 필수 입력항목 입니다.");
-			$("#dialog-message")
-				.attr("title", "방명록남기기")				
-				.dialog();
-			
-			$("#input-password").focus();
+			messageBox("방명록남기기", "비밀번호는 필수 입력항목 입니다.", function(){
+				$("#input-password").focus();
+			});
 			return;
 		}
 		
 		vo.contents = $("#tx-content").val();
-		//console.log($.param(vo));
-		//console.log(JSON.stringify(vo));
+		if(vo.contents == ""){
+			messageBox("방명록남기기", "내용 필수 입력항목 입니다.", function(){
+				$("#tx-content").focus();
+			});
+			return;
+		}
 		
 		//ajax 통신
 		$.ajax({
@@ -139,7 +236,8 @@ $(function(){
 				}
 				
 				// rendering
-				render(response.data);
+				var html = listItemTemplate.render(response.data);
+				$("#list-guestbook").prepend(html);
 				
 				// form reset		
 				$("#add-form")[0].reset();
@@ -161,8 +259,19 @@ $(function(){
 		}
 	});
 	
+	// Live Event: 존재하지 않는 element의 이벤트 핸들러를 미리 bind하는 것
+	// delegation(위임)
+	$(document).on('click', '#list-guestbook li a', function(event){
+		event.preventDefault();
+		
+		$("#no-delete").val($(this).data("no"));
+		dialogDelete.dialog('open');
+	});
+	
 	// 처음 리스트 가져오기
 	fetchList();
+	
+	
 	
 	// jquery plugin test
 	$("#btn-next").hello();
@@ -196,7 +305,7 @@ $(function(){
   				<p class="validateTips error" style="display:none">비밀번호가 틀립니다.</p>
   				<form>
  					<input type="password" id="password-delete" value="" class="text ui-widget-content ui-corner-all">
-					<input type="hidden" id="hidden-no" value="">
+					<input type="hidden" id="no-delete" value="">
 					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
   				</form>
 			</div>

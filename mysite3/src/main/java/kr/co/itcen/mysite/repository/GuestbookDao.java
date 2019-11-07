@@ -14,9 +14,18 @@ public class GuestbookDao {
 	@Autowired
 	private SqlSession sqlSession;
 
-	public void delete(GuestbookVo vo) {
+	public int delete(GuestbookVo vo) {
+		int count = sqlSession.delete("guestbook.delete", vo);
+		return count;
+	
 
-		sqlSession.delete("guestbook.delete", vo);
+	}
+	public int delete(Long no, String password) {
+		GuestbookVo vo = new GuestbookVo();
+		vo.setNo(no);
+		vo.setPassword(password);
+		
+		return delete(vo);
 
 	}
 

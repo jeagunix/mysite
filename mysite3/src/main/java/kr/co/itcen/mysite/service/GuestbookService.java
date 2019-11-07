@@ -24,6 +24,10 @@ public class GuestbookService {
 		guestbookDao.delete(vo);
 		
 	}
+	public boolean delete(Long no, String password) {
+		return 1 == guestbookDao.delete(no, password);
+		
+	}
 
 	public void insert(GuestbookVo vo) {
 		guestbookDao.insert(vo);
