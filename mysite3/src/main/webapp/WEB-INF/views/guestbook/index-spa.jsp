@@ -12,6 +12,28 @@
 <script type="text/javascript" src="${pageContext.request.contextPath }/assets/js/jquery/jquery-1.9.0.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+// jquery plug-in
+(function($){
+	$.fn.hello = function(){
+		console.log("hello #" + $(this).attr("id"));
+	}  
+})(jQuery);
+(function($){
+	$.fn.flash = function(){
+		$(this).click(function(){
+			var isBlink = false;
+			var $that = $(this);
+			setInterval(function(){
+				$that.css("backgroundColor", isBlink ? "#f" : "#aaa");
+				isBlink = !isBlink;
+			}, 1000);
+		});
+	}  
+})(jQuery);
+</script>
+
+
+<script>
 var isEnd = false;
 var startNo = 0;
 var render = function(vo, mode){
@@ -73,10 +95,31 @@ $(function(){
 	$("#add-form").submit(function(event){
 		event.preventDefault();
 		
+		var vo = {};
+		
 		// validation(client side)
-		vo = {};
 		vo.name = $("#input-name").val();
+		if(vo.name == ""){
+			$("#dialog-message p").text("이름은 필수 입력항목 입니다.");
+			$("#dialog-message")
+				.attr("title", "방명록남기기")				
+				.dialog();
+			
+			$("#input-name").focus();
+			return;
+		}
+		
 		vo.password = $("#input-password").val();
+		if(vo.password == ""){
+			$("#dialog-message p").text("비밀번호는 필수 입력항목 입니다.");
+			$("#dialog-message")
+				.attr("title", "방명록남기기")				
+				.dialog();
+			
+			$("#input-password").focus();
+			return;
+		}
+		
 		vo.contents = $("#tx-content").val();
 		//console.log($.param(vo));
 		//console.log(JSON.stringify(vo));
@@ -120,6 +163,10 @@ $(function(){
 	
 	// 처음 리스트 가져오기
 	fetchList();
+	
+	// jquery plugin test
+	$("#btn-next").hello();
+	$("#btn-next").flash();
 });
 </script>
 </head>
@@ -155,7 +202,7 @@ $(function(){
 			</div>
 			<div id="dialog-message" title="" style="display:none">
   				<p></p>
-			</div>						
+			</div>
 		</div>
 		<c:import url="/WEB-INF/views/includes/navigation.jsp">
 			<c:param name="menu" value="guestbook-ajax"/>
